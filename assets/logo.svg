@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Logo de TurnoYa">
+  <rect width="128" height="128" rx="28" fill="#0F4C5C"/>
+  <rect x="26" y="34" width="76" height="72" rx="12" fill="#F2F5F7"/>
+  <path d="M26 46a12 12 0 0 1 12-12h52a12 12 0 0 1 12 12v12H26z" fill="#E0A100"/>
+  <rect x="44" y="22" width="9" height="22" rx="4.5" fill="#F2F5F7"/>
+  <rect x="75" y="22" width="9" height="22" rx="4.5" fill="#F2F5F7"/>
+  <path d="M46 84l13 13 25-27" fill="none" stroke="#0F7B5F" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

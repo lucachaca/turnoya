@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TurnoYa · Reservá tu turno</title>
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<style>
+  :root {
+    --base: #F2F5F7; --panel: #FFFFFF; --ink: #12202B; --muted: #5B6B76; --line: #D3DCE2;
+    --teal: #0F4C5C; --green: #0F7B5F; --amber: #E0A100; --amber-soft: #FFF3CF; --red: #B3261E; --red-soft: #FBE4E2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --base: #0E1A21; --panel: #15252E; --ink: #E8EEF2; --muted: #9DB0BB; --line: #2A3E4A;
+            --teal: #7CC3D6; --green: #4CC9A0; --amber-soft: #3A3010; --red: #FF8A80; --red-soft: #3D1B19; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--base); color: var(--ink);
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; align-items: center; gap: 14px; padding: 18px clamp(16px, 4vw, 48px); border-bottom: 1px solid var(--line); background: var(--panel); }
+  header img { width: 48px; height: 48px; }
+  header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -.01em; }
+  header p { margin: 0; color: var(--muted); font-size: .9rem; }
+  header button { margin-left: auto; }
+  main { display: grid; gap: 24px; padding: clamp(16px, 4vw, 48px); max-width: 1180px; margin: 0 auto; grid-template-columns: 1fr; }
+  @media (min-width: 960px) { main { grid-template-columns: 1.6fr 1fr; align-items: start; } }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  h2 { margin: 0 0 14px; font-size: 1.1rem; }
+  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: .9rem; }
+  input[type=text], input[type=date] { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--base); color: var(--ink); font: inherit; }
+  .fila { display: grid; gap: 14px; grid-template-columns: 1fr; margin-bottom: 18px; }
+  @media (min-width: 600px) { .fila { grid-template-columns: 1fr 1fr; } }
+  .recursos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-bottom: 18px; }
+  .recurso { text-align: left; padding: 12px 14px; border: 2px solid var(--line); border-radius: 12px; background: var(--base); color: var(--ink); cursor: pointer; font: inherit; }
+  .recurso strong { display: block; }
+  .recurso span { color: var(--muted); font-size: .85rem; }
+  .recurso[aria-pressed=true] { border-color: var(--green); background: var(--panel); box-shadow: inset 0 0 0 1px var(--green); }
+  .fecha-titulo { font-size: 1.15rem; font-weight: 700; margin: 4px 0 12px; }
+  .grilla { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .hora { border: 2px solid var(--line); border-radius: 12px; padding: 10px 6px 8px; background: var(--panel); color: var(--ink); font: inherit; cursor: pointer; text-align: center; }
+  .hora b { display: block; font-size: 1.9rem; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .hora small { display: block; margin-top: 4px; font-size: .78rem; color: var(--muted); }
+  .hora.libre:hover { border-color: var(--green); }
+  .hora.ocupado, .hora.pasado { cursor: not-allowed; background: repeating-linear-gradient(135deg, transparent 0 7px, var(--line) 7px 8px); color: var(--muted); }
+  .hora.ocupado b, .hora.pasado b { text-decoration: line-through; text-decoration-thickness: 2px; }
+  .hora.mio { background: var(--green); border-color: var(--green); color: #fff; cursor: default; }
+  .hora.mio small { color: #E4FFF5; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .btn { padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--base); color: var(--ink); font: inherit; cursor: pointer; }
+  .btn.peligro { color: var(--red); border-color: var(--red); }
+  .btn.primario { background: var(--teal); color: var(--base); border-color: var(--teal); }
+  .turno { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 10px; display: grid; gap: 4px; }
+  .turno .top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .turno.cancelado, .turno.cancelado_con_cargo { opacity: .75; }
+  .estado { font-size: .8rem; padding: 2px 8px; border-radius: 99px; border: 1px solid var(--line); white-space: nowrap; }
+  .estado.confirmado { border-color: var(--green); color: var(--green); }
+  .estado.cancelado_con_cargo { border-color: var(--amber); background: var(--amber-soft); }
+  .vacio { color: var(--muted); }
+  .reglas { margin: 0; padding-left: 18px; color: var(--muted); font-size: .9rem; }
+  .reglas li { margin-bottom: 4px; }
+  #aviso { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); max-width: min(560px, 92vw); padding: 12px 18px; border-radius: 12px; font-weight: 600; box-shadow: 0 6px 24px rgba(0,0,0,.25); }
+  #aviso[hidden] { display: none; }
+  #aviso.ok { background: var(--green); color: #fff; }
+  #aviso.error { background: var(--red-soft); color: var(--red); border: 2px solid var(--red); }
+  dialog { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); max-width: 420px; padding: 22px; }
+  dialog::backdrop { background: rgba(0,0,0,.45); }
+  dialog menu { display: flex; gap: 10px; justify-content: flex-end; padding: 0; margin: 18px 0 0; }
+  @media (prefers-reduced-motion: no-preference) { .hora, .recurso { transition: border-color .12s; } }
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/logo.svg" alt="Logo de TurnoYa">
+  <div><h1>TurnoYa</h1><p>Reservá canchas y consultorios en un minuto</p></div>
+  <button class="btn" id="reiniciar" type="button">Borrar datos de prueba</button>
+</header>
+
+<main>
+  <div>
+    <section aria-labelledby="t-reserva">
+      <h2 id="t-reserva">Reservar un turno</h2>
+      <div class="fila">
+        <div><label for="cliente">Tu nombre</label><input id="cliente" type="text" autocomplete="name" placeholder="Ej: Luca"></div>
+        <div><label for="fecha">Fecha</label><input id="fecha" type="date"></div>
+      </div>
+      <div class="recursos" id="recursos" role="group" aria-label="Elegí dónde"></div>
+      <div class="fecha-titulo" id="fecha-titulo"></div>
+      <div class="grilla" id="grilla"></div>
+    </section>
+  </div>
+  <div>
+    <section aria-labelledby="t-mis">
+      <h2 id="t-mis">Mis turnos</h2>
+      <div id="mis-turnos"></div>
+    </section>
+    <section style="margin-top:24px" aria-labelledby="t-reglas">
+      <h2 id="t-reglas">Cómo funciona</h2>
+      <ul class="reglas" id="reglas"></ul>
+    </section>
+  </div>
+</main>
+
+<div id="aviso" role="status" aria-live="polite" hidden></div>
+<dialog id="dialogo"><p id="dialogo-texto"></p><menu><button class="btn" id="dialogo-no" type="button">Volver</button><button class="btn primario" id="dialogo-si" type="button">Cancelar turno</button></menu></dialog>
+
+<script type="module" src="src/app.js"></script>
+</body>
+</html>
